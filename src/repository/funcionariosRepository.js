@@ -1,43 +1,65 @@
-// 
+import con from "./connection.js"; 
 
-import con from './Connection.js'
-
-export async function validarUsuario(user){
+export async function inserirFuncionarios(funcionario) {
     const comando = `
-    select  
-        id        id ,   
-        nome      nome
-    from usuarios
-    where
-        nome = ?
-        and senha = ?
-    `;
+    insert into Funcionarios (Nome_Completo, Data_Nascimento, CPF, Telefone,Endereco, Cargo, Email, Formacao_Academica )
+                    values (?, ?, ?, ?, ?, ?, ?, ?)
+    
+    `; 
 
-    let registros = await con.query(comando , [user.nome, user.senha]);
-    return registros[0][0];
+    let resposta = await con.query (comando, [funcionario.nomeCompleto, funcionario.DataDeNascimento, funcionario.CPF, funcionario.Telefone, funcionario.Endereco, funcionario.Cargo, funcionario.Email, funcionario.formacaoAcademica])
+    let info = resposta [0]; 
+
+    return info.insertId; 
 }
 
-export async function alterarUsuario(id, user){
+export async function consultarPacientes() {
     const comando = `
-        update usuarios
-        set nome = ?,
-            senha = ?
-        where id = ?
-    `;
+    select ID_Funcionario         ID,
+        Nome_Completo           nome,
+        Data_Nascimento         data,
+        CPF                     identificacao,
+        Telefone                numero
+        Cargo                   hierarquia,
+        Endereco                localizacao ,
+        Email                   comunicacao,
+        Formacao_Academica      text
+    from Funcionarios
+    `; 
 
-    let resposta = await con.query(comando , [user.nome, user.senha, id])
-    let info = resposta [0];
 
-    return info.affectedRows;
+    let resposta = await con.query (comando); 
+    let registros = resposta [0]; 
+
+    return registros
 }
 
-export async function deletarUsuario(id){
+export async function alterarPacientes(id, funcionario){
     const comando = `
-        delete from usuarios
-        where id = ?
+        update Funcionarios 
+            Nome_Completo = ?,
+            Data_Nascimento = ?,
+            CPF = ?, 
+            Telefone = ?, 
+            Endereco = ?, 
+            Cargo = ?, 
+            Email = ?, 
+            Formacao_Academica ; 
     `
-    let resposta = await con.query(comando, [id]);
-    let info = resposta[0];
+    let resposta = await con.query(comando,[funcionario.nomeCompleto, funcionario.DataDeNascimento, funcionario.CPF, funcionario.Telefone, funcionario.Endereco, funcionario.Cargo, funcionario.Email, funcionario.formacaoAcademica, id])
+    let info = resposta [0]; 
 
-    return info.affectedRows;
+    return info.affectedRows; 
+}
+
+export async function removerFuncionarios(id){
+    const comando = `
+            delete from Funcionarios
+            where ID_Funcionarios = ?
+    `
+
+    let resposta = await con.query (comando, [id]); 
+    let info = resposta [0]; 
+
+    return info.affectedRows; 
 }
